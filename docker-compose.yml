@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      - "/c/Users/saian/OneDrive/Documents/408/videogamestore:/var/www/html"
+    environment:
+      - MYSQL_HOST=cmsc508.com
+      - MYSQL_USER=24fa_mussima
+      - MYSQL_PASSWORD=Shout4_mussima_JOY
+      - MYSQL_DATABASE=24fa_hr_24fa_mussima
+
+  db:
+    image: mysql:8.0
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: Shout4_mussima_JOY
+      MYSQL_DATABASE: 24fa_hr_24fa_mussima
+      MYSQL_USER: 24fa_mussima
+      MYSQL_PASSWORD: Shout4_mussima_JOY
+
+volumes:
+  db_data:
