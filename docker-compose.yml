@@ -6,7 +6,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - "/c/Users/saian/OneDrive/Documents/408/videogamestore:/var/www/html"
+      - "/c/Users/saian/OneDrive/Documents/408/videogamestore/site:/var/www/html"
     environment:
       - MYSQL_HOST=cmsc508.com
       - MYSQL_USER=24fa_mussima

@@ -1,0 +1,7 @@
+# .gitignore
+
+.vscode
+.env
+
+*.csv
+*.quarto_ipynb
