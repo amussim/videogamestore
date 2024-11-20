@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'db_connect.php'; // Ensure this file has the correct database connection setup
+include 'db_connect.php'; // Ensure your database connection script is included
 
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'customer') {
     header('Location: login.php');
@@ -138,6 +138,11 @@ $products = $mysqli->query("SELECT product_id, type, price, stock FROM Product W
             <p>Update your personal information and preferences.</p>
             <a href="update_profile.php">Update Profile</a>
         </div>
+        <div class="card">
+            <h2>Submit Feedback</h2>
+            <p>Provide your feedback on our products and services.</p>
+            <a href="customer_feedback.php">Submit Feedback</a>
+        </div>
     </div>
 
     <h2>Available Products</h2>
@@ -158,3 +163,4 @@ $products = $mysqli->query("SELECT product_id, type, price, stock FROM Product W
     </form>
 </body>
 </html>
+

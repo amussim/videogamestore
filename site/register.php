@@ -1,40 +1,60 @@
 <?php
-include 'db_connect.php'; // Database connection
+session_start();
+include 'db_connect.php';  // Ensure your database connection script is included
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+// Start output buffering at the very beginning of the script
+ob_start();
+
+// Registration logic here
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $email = $_POST['email'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // Hash the password
+    $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
 
-    $sql = "INSERT INTO Account (account_id, email, password) VALUES (?, ?, ?)";
-    if ($stmt = $mysqli->prepare($sql)) {
+    // Check if username already exists
+    $checkStmt = $mysqli->prepare("SELECT account_id FROM Account WHERE account_id = ?");
+    $checkStmt->bind_param("s", $username);
+    $checkStmt->execute();
+    $checkStmt->store_result();
+
+    if ($checkStmt->num_rows > 0) {
+        echo "<p>Registration failed: Username already exists. Please choose a different username.</p>";
+    } else {
+        // Insert user data into the database
+        $stmt = $mysqli->prepare("INSERT INTO Account (account_id, email, password, join_date) VALUES (?, ?, ?, NOW())");
         $stmt->bind_param("sss", $username, $email, $password);
+
         if ($stmt->execute()) {
-            echo "<p>Registration successful!</p>";
-            header('Refresh:2; url=login.php'); // Redirect after 2 seconds to login page
+            $_SESSION['message'] = "Registration successful!";
+            header('Location: customer_dashboard.php');
+            exit();
         } else {
-            echo "<p>Error: " . $stmt->error . "</p>";
+            echo "<p>Registration failed: " . $stmt->error . "</p>";
         }
         $stmt->close();
     }
-    $mysqli->close();
+    $checkStmt->close();
 }
+
+// End of script
+ob_end_flush();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - GameSphere</title>
+    <title>Register</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            flex-direction: column;
         }
         form {
             background-color: #ffffff;
@@ -43,59 +63,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             width: 300px;
         }
-        label {
-            display: block;
-            margin-top: 10px;
-        }
-        input[type="text"],
-        input[type="email"],
-        input[type="password"] {
+        input[type="text"], input[type="email"], input[type="password"] {
             width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
             border-radius: 4px;
-            box-sizing: border-box;
         }
         button {
-            width: 100%;
             background-color: #0056b3;
             color: white;
-            padding: 10px;
+            padding: 8px 16px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            margin-top: 20px;
         }
         button:hover {
             background-color: #003580;
         }
-        .login-link {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .login-link a {
+        a {
             color: blue;
             text-decoration: none;
         }
-        .login-link a:hover {
+        a:hover {
             text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <form action="register.php" method="post">
-        <h2>Register</h2>
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required><br>
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required><br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br>
+    <h1>Register</h1>
+    <form method="post" action="">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password" required>
         <button type="submit">Register</button>
-        <div class="login-link">
-            <p>Already have an account? <a href="login.php">Go to Login Page</a></p>
-        </div>
     </form>
+    <a href="login.php">Already have an account? Log in here.</a>
 </body>
 </html>

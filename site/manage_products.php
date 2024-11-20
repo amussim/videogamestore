@@ -2,6 +2,9 @@
 session_start();
 include 'db_connect.php';  // Ensure your database connection script is included
 
+// Start output buffering at the very beginning of the script
+ob_start();
+
 // Check user role for permission (assuming only admins can manage products)
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header('Location: login.php');
@@ -34,7 +37,8 @@ if (isset($_GET['delete'])) {
     $stmt = $mysqli->prepare("DELETE FROM Product WHERE product_id = ?");
     $stmt->bind_param("s", $productId);
     if ($stmt->execute()) {
-        echo "<p>Product deleted successfully!</p>";
+        header("Location: manage_products.php?message=deleted");
+        exit();
     } else {
         echo "<p>Error deleting product: " . $stmt->error . "</p>";
     }
@@ -42,6 +46,9 @@ if (isset($_GET['delete'])) {
     header("Refresh:2; url=manage_products.php");
     exit;
 }
+
+// End of script
+ob_end_flush();
 ?>
 
 <!DOCTYPE html>
